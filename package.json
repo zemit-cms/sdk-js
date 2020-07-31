@@ -1,0 +1,32 @@
+{
+  "name": "@zemit/sdk-js",
+  "version": "0.0.1-alpha",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "main": "./dist/index.js",
+  "author": {
+    "name": "Danny Coulombe",
+    "email": "dcoulombe@zemit.com",
+    "url": "https://github.com/dannycoulombe"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zemit-cms/sdk-js.git"
+  },
+  "license": "BSD-3",
+  "devDependencies": {
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "source-map-loader": "^0.1.5",
+    "ts-loader": "^1.0.0",
+    "tslint": "^3.15.1",
+    "tslint-loader": "^2.1.5",
+    "typescript": "^2.1.1",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2",
+    "webpack-fail-plugin": "^1.0.5"
+  }
+}
