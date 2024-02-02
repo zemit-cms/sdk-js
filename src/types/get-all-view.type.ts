@@ -1,2 +1,1 @@
-export default interface GetAllView {
-}
+export default interface GetAllView {}

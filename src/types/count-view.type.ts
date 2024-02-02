@@ -1,2 +1,1 @@
-export default interface Count {
-}
+export default interface Count {}

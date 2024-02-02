@@ -1,0 +1,1 @@
+{"version":3,"file":"zemit-identity.type.d.ts","sourceRoot":"","sources":["../../src/types/zemit-identity.type.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,WAAW,aAAa;IACpC,SAAS,EAAE,GAAG,CAAC;IACf,QAAQ,EAAE,OAAO,CAAC;IAClB,UAAU,EAAE,OAAO,CAAC;IACpB,QAAQ,EAAE,GAAG,CAAC;IACd,QAAQ,EAAE,GAAG,CAAC;IACd,IAAI,EAAE,GAAG,CAAC;IACV,MAAM,EAAE,GAAG,CAAC;CACb"}

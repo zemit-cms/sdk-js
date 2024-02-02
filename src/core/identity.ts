@@ -1,7 +1,7 @@
 import AuthService from '@/services/auth.service';
 import Logger from '@/core/logger';
 import store from 'store2';
-import {AxiosResponse} from 'axios';
+import { AxiosResponse } from 'axios';
 import ZemitData from '@/types/zemit-data.type';
 import GetView from '@/types/auth/get-view.type';
 import RefreshView from '@/types/auth/refresh-view.type';
@@ -11,9 +11,8 @@ const d = new Logger('zemit/core/identity');
 export type NestedArrayOr<T> = T | Array<NestedArrayOr<T>>;
 
 export default class Identity {
-
   static identity?: GetView;
-  static refreshResponse: null|Promise<AxiosResponse<ZemitData<RefreshView>>> = null;
+  static refreshResponse: null | Promise<AxiosResponse<ZemitData<RefreshView>>> = null;
 
   static setIdentity(identity: GetView) {
     d.d('setIdentity', identity);
@@ -39,20 +38,25 @@ export default class Identity {
   static newIdentity() {
     d.d('newIdentity');
     this.removeIdentity();
-    return AuthService.getInstance().get().then(success => {
-      this.setIdentity(success.data.view);
-      d.d('new', this.identity);
-    });
+    return AuthService.getInstance()
+      .get()
+      .then((success) => {
+        this.setIdentity(success.data.view);
+        d.d('new', this.identity);
+      });
   }
 
   static refreshIdentity() {
     d.d('refreshIdentity');
-    return AuthService.getInstance().get().then(success => {
+    return AuthService.getInstance()
+      .get()
+      .then((success) => {
         this.setIdentity(success.data.view);
-      }).catch(reason => {
+      })
+      .catch((reason) => {
         d.d('refreshIdentity', reason);
         this.removeIdentity();
-    });
+      });
   }
 
   /**
@@ -94,32 +98,27 @@ export default class Identity {
     for (const needle of [...needles]) {
       if (Array.isArray(needle)) {
         result.push(this.has(needle, haystack, !or));
-      }
-      else {
+      } else {
         result.push(haystack.includes(needle));
       }
     }
 
-    return or
-      ? !result.includes(false)
-      : result.includes(true);
+    return or ? !result.includes(false) : result.includes(true);
   }
 
-  static hasPermission() {
-
-  }
+  static hasPermission() {}
 
   static refreshPromise = () => {
     if (!Identity.refreshResponse) {
       const refreshToken = Identity.getIdentity()?.refreshToken;
       Identity.refreshResponse = new Promise((resolve, reject) =>
-        AuthService.getInstance().refresh({refreshToken})
-          .then(response => Identity.setIdentity(response.data.view) && resolve(response))
-          .catch(reason => reject(reason))
-          .finally(() => Identity.refreshResponse = null)
+        AuthService.getInstance()
+          .refresh({ refreshToken })
+          .then((response) => Identity.setIdentity(response.data.view) && resolve(response))
+          .catch((reason) => reject(reason))
+          .finally(() => (Identity.refreshResponse = null)),
       );
     }
-    return Identity.refreshResponse
-  }
-
+    return Identity.refreshResponse;
+  };
 }

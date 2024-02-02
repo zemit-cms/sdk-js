@@ -1,14 +1,14 @@
 import Logger from '@/core/logger';
-import deepmerge, {Options} from 'deepmerge';
+import deepmerge, { Options } from 'deepmerge';
 
 const d = new Logger('zemit/core/model');
 
 export interface ModelConfig {
-  castOnHydrate: boolean,
-  lateStateBinding: boolean,
-  forceCasting: boolean,
-  cache: boolean,
-  events: boolean,
+  castOnHydrate: boolean;
+  lateStateBinding: boolean;
+  forceCasting: boolean;
+  cache: boolean;
+  events: boolean;
 }
 
 export type Data = { [key: string]: any };
@@ -21,23 +21,20 @@ export interface IModel<T = Data> {
 }
 
 export default class Model implements IModel {
-
   static staticAutoIncrementId = 0;
   autoIncrementId = 0;
   position = 0;
   loading = false;
   data: Data = {};
   originalData: Data = {};
-  originalDataJSON: string | null = null
-  states: {[key: string]: boolean} = {
+  originalDataJSON: string | null = null;
+  states: { [key: string]: boolean } = {
     saving: false,
     deleting: false,
     restoring: false,
-  }
+  };
 
-  constructor(
-    data: Data | Model = {}
-  ) {
+  constructor(data: Data | Model = {}) {
     this._autoIncrement();
     this.setDefault(this.default(), this.getData(data));
     this.map(this.columnMap());
@@ -71,7 +68,7 @@ export default class Model implements IModel {
   }
 
   private _autoIncrement() {
-    return this.autoIncrementId = Model.staticAutoIncrementId++;
+    return (this.autoIncrementId = Model.staticAutoIncrementId++);
   }
 
   public getData(data: Model | Data | any = this.data): { [key: string]: any } {
@@ -95,10 +92,12 @@ export default class Model implements IModel {
     };
   }
 
-  uploadMap(): { [key: string]: {
-    key: string,
-    category: string,
-  } } {
+  uploadMap(): {
+    [key: string]: {
+      key: string;
+      category: string;
+    };
+  } {
     return {};
   }
 
@@ -128,7 +127,6 @@ export default class Model implements IModel {
    * Map Columns
    */
   map(map: { [key: string]: any }, data: Model | { [key: string]: any } = this): void {
-
     // No mapping to process
     if (!map) {
       return;
@@ -155,10 +153,8 @@ export default class Model implements IModel {
       length = Object.keys(map).length;
       for (const key in map) {
         if (Object.prototype.hasOwnProperty.call(map, key) && data[map[key]] !== 'undefined') {
-
           // do not overwrite existing property
           if (Object.prototype.hasOwnProperty.call(data, map[key])) {
-
             // do not process same key
             if (key === map[key]) {
               delete map[key];
@@ -206,20 +202,21 @@ export default class Model implements IModel {
       if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== 'undefined') {
         const RelatedModel = map[key];
         data[key] = Array.isArray(data[key])
-          ? data[key].map((related: any) => related instanceof RelatedModel ? related : new RelatedModel(related)) // map list
-          : data[key] instanceof RelatedModel ? data[key] : new RelatedModel(data[key]) // map single
-        ;
+          ? data[key].map((related: any) => (related instanceof RelatedModel ? related : new RelatedModel(related))) // map list
+          : data[key] instanceof RelatedModel
+          ? data[key]
+          : new RelatedModel(data[key]); // map single
       }
     }
   }
 
   mapUploads() {
     const uploadMap = this.uploadMap();
-    Object.keys(uploadMap).forEach(key => {
+    Object.keys(uploadMap).forEach((key) => {
       if (this.data[key]) {
         this.data[uploadMap[key].key] = this.data[key].id;
       }
-    })
+    });
   }
 
   /**
@@ -270,7 +267,7 @@ export default class Model implements IModel {
         if (
           (!toLowerCase && object.data[prop] !== props[prop]) ||
           (toLowerCase && object.data[prop].toLowerCase() !== props[prop].toLowerCase())
-          ) {
+        ) {
           assign = false;
           break;
         }
@@ -292,13 +289,8 @@ export default class Model implements IModel {
    */
   sortByProperty(property = 'position', key: string, id = 'id') {
     return this.data[property].sort((a: Model, b: Model) =>
-      (a.data[key] > b.data[key])
-        ? 1
-        : (a.data[key] === b.data[key])
-          ? ((a.data[id] > b.data[id])
-            ? 1
-            : -1)
-          : -1)
+      a.data[key] > b.data[key] ? 1 : a.data[key] === b.data[key] ? (a.data[id] > b.data[id] ? 1 : -1) : -1,
+    );
   }
 
   /**
@@ -325,7 +317,6 @@ export default class Model implements IModel {
             ret[key].unshift(false);
           }
         }
-
       } else {
         if (data[key] instanceof Model) {
           ret[key] = data[key].toObject();
@@ -363,11 +354,11 @@ export default class Model implements IModel {
   assign(data: Data | Model = {}, specificKeys: Array<string> = []) {
     const newData = this.getData(data);
     if (specificKeys.length > 0) {
-      Object.keys(newData).forEach(key => {
+      Object.keys(newData).forEach((key) => {
         if (!specificKeys.includes(key)) {
           delete newData[key];
         }
-      })
+      });
     }
     const result = Object.assign(this.data, newData);
     this.setOriginalData();
@@ -378,13 +369,13 @@ export default class Model implements IModel {
    * Deep Merge to data
    */
   deepmerge(data: Data | Model = {}, options?: Options) {
-    deepmerge.all([this.data, this.getData(data)], options)
+    deepmerge.all([this.data, this.getData(data)], options);
   }
 
   /**
    * Clone Entire Model
    */
-  clone<T> (): T {
+  clone<T>(): T {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const clone = new this.constructor(structuredClone(this.toObject(this.data, true)));
@@ -400,9 +391,7 @@ export default class Model implements IModel {
   }
 
   isDifferentFromOriginal(data?: any): boolean {
-    const originalDataJson = this.originalDataJSON === null
-      ? this.setOriginalData()
-      : this.originalDataJSON;
+    const originalDataJson = this.originalDataJSON === null ? this.setOriginalData() : this.originalDataJSON;
     if (data) {
       return JSON.stringify(data) !== originalDataJson;
     } else {

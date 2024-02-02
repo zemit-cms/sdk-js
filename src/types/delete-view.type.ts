@@ -1,2 +1,1 @@
-export default interface DeleteView {
-}
+export default interface DeleteView {}

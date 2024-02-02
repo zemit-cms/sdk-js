@@ -4,7 +4,6 @@ import RoleModel from './role.model';
 import TypeModel from './type.model';
 
 export default class UserModel extends Model {
-
   default() {
     return {
       roleList: [],
@@ -13,12 +12,12 @@ export default class UserModel extends Model {
     };
   }
 
-  relatedMap () {
+  relatedMap() {
     return {
       roleList: RoleModel,
       groupList: GroupModel,
       typeList: TypeModel,
-    }
+    };
   }
 
   getLabel(): string {
@@ -31,6 +30,6 @@ export default class UserModel extends Model {
 
   getInitials(): string {
     const str = this.data.firstName + ' ' + this.data.lastName;
-    return str.split(/\s/).reduce((response, word) => response += word.slice(0, 1), '');
+    return str.split(/\s/).reduce((response, word) => (response += word.slice(0, 1)), '');
   }
 }

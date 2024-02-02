@@ -6,7 +6,7 @@ import axios, {
   AxiosInterceptorManager,
   InternalAxiosRequestConfig,
   AxiosRequestConfig,
-  AxiosResponse
+  AxiosResponse,
 } from 'axios';
 import Logger from '@/core/logger';
 import Identity from '@/core/identity';
@@ -20,20 +20,19 @@ import ZemitData from '@/types/zemit-data.type';
 const d = new Logger('zemit/core/service');
 
 export type ModelServiceEndpointType =
-  'getAll' |
-  'getList' |
-  'get' |
-  'export' |
-  'count' |
-  'new' |
-  'validate' |
-  'save' |
-  'create' |
-  'update' |
-  'delete' |
-  'restore' |
-  ''
-  ;
+  | 'getAll'
+  | 'getList'
+  | 'get'
+  | 'export'
+  | 'count'
+  | 'new'
+  | 'validate'
+  | 'save'
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'restore'
+  | '';
 
 export class ZemitOptions {
   apiUrl = '';
@@ -46,7 +45,6 @@ export abstract class ServiceConfig {
 }
 
 export default class Service extends ServiceConfig {
-
   http!: AxiosInstance;
   baseUrl = '';
   modelUrl = '';
@@ -72,12 +70,12 @@ export default class Service extends ServiceConfig {
 
   refreshOnUnauthorized = true;
 
-  constructor (opts: Partial<ServiceConfig> = {}) {
+  constructor(opts: Partial<ServiceConfig> = {}) {
     super();
     Object.assign(this, opts);
   }
 
-  static getInstance<T, K extends keyof ServiceConfig> (this: new () => T, opts: Partial<ServiceConfig> = {}): T {
+  static getInstance<T, K extends keyof ServiceConfig>(this: new () => T, opts: Partial<ServiceConfig> = {}): T {
     const instance = new this();
 
     for (const key in opts) {
@@ -91,12 +89,13 @@ export default class Service extends ServiceConfig {
   }
 
   getEndpointUrl = (endpoint: ModelServiceEndpointType | string): string => this.endpointList[endpoint] || endpoint;
-  setEndpointUrl = (endpoint: ModelServiceEndpointType | string, url: string): string => this.endpointList[endpoint] = url;
+  setEndpointUrl = (endpoint: ModelServiceEndpointType | string, url: string): string =>
+    (this.endpointList[endpoint] = url);
 
   getBaseUrl = () => this.baseUrl;
-  setBaseUrl = (url: string) => this.baseUrl = url;
+  setBaseUrl = (url: string) => (this.baseUrl = url);
 
-  setModelUrl = (url: string) => this.modelUrl = url;
+  setModelUrl = (url: string) => (this.modelUrl = url);
   getModelUrl = () => this.modelUrl;
 
   /**
@@ -104,11 +103,10 @@ export default class Service extends ServiceConfig {
    * @param endpoint
    */
   getUrl(endpoint: ModelServiceEndpointType | string) {
-    return [
-      this.getBaseUrl(),
-      this.getModelUrl(),
-      this.getEndpointUrl(endpoint)
-    ].filter(Boolean).join('/').replace(/\/+/g, '\/');
+    return [this.getBaseUrl(), this.getModelUrl(), this.getEndpointUrl(endpoint)]
+      .filter(Boolean)
+      .join('/')
+      .replace(/\/+/g, '/');
   }
 
   /**
@@ -153,7 +151,7 @@ export default class Service extends ServiceConfig {
     config: AxiosRequestConfig<D> = {},
     success?: CallableFunction,
     error?: CallableFunction,
-    complete?: CallableFunction
+    complete?: CallableFunction,
   ): Promise<AxiosResponse<ZemitData<R>>> {
     /**
      * Create default Axios Request
@@ -163,18 +161,17 @@ export default class Service extends ServiceConfig {
     this.http.interceptors.response.use(this.responseInterceptor, this.rejectedResponseInterceptor);
     this.http.interceptors.request.use(this.requestInterceptor);
 
-    return this.prepareUploads(data)
-      .then(data => {
-        this.prepareRequestConfig(url, data, config)
-        this.beforeRequest(config);
+    return this.prepareUploads(data).then((data) => {
+      this.prepareRequestConfig(url, data, config);
+      this.beforeRequest(config);
 
-        return new Promise((resolve, reject) =>
-          this.http(config)
-            .then((response: AxiosResponse<any>) => this.success(response, resolve, reject, success))
-            .catch((reason: AxiosError<any>) => this.error(reason, resolve, reject, error))
-            .finally(() => this.complete(resolve, reject, complete)),
-        );
-      })
+      return new Promise((resolve, reject) =>
+        this.http(config)
+          .then((response: AxiosResponse<any>) => this.success(response, resolve, reject, success))
+          .catch((reason: AxiosError<any>) => this.error(reason, resolve, reject, error))
+          .finally(() => this.complete(resolve, reject, complete)),
+      );
+    });
   }
 
   /**
@@ -200,20 +197,15 @@ export default class Service extends ServiceConfig {
   uploadFile(file: File, category: string) {
     const formData = new FormData();
     formData.append('file', file);
-    return this.handleRequest(
-      this.getBaseUrl() + '/file/upload/' + category,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
-    );
+    return this.handleRequest(this.getBaseUrl() + '/file/upload/' + category, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   prepareUploads<D = any>(model: D | any): Promise<any> {
     return new Promise((resolve, reject) => {
-
       if (!(model instanceof Model)) {
         resolve(model);
       }
@@ -221,33 +213,32 @@ export default class Service extends ServiceConfig {
       const data = model.toObject();
       const uploadMap: any = model.uploadMap();
       const promises: Array<Promise<any>> = [];
-      Object.keys(data).forEach(key => {
+      Object.keys(data).forEach((key) => {
         if (uploadMap[key]) {
           if (data[key] instanceof File) {
             promises.push(
-              this.uploadFile(data[key], uploadMap[key].category)
-                .then(response => {
-                  data[uploadMap[key].key] = response.data.view[0].file.id;
-                  return response;
-                })
+              this.uploadFile(data[key], uploadMap[key].category).then((response) => {
+                data[uploadMap[key].key] = response.data.view[0].file.id;
+                return response;
+              }),
             );
           } else if (data[key] === null) {
             data[uploadMap[key].key] = null;
           }
           delete data[key];
         }
-      })
+      });
 
       Promise.all(promises).then(() => {
         resolve(data);
       });
-    })
+    });
   }
 
   /**
    * Process parameters before Axios Request
    */
-  beforeRequest<D = any>(config: AxiosRequestConfig<D|any>) {
+  beforeRequest<D = any>(config: AxiosRequestConfig<D | any>) {
     d.d('beforeRequest', config);
 
     // prepare model
@@ -259,10 +250,8 @@ export default class Service extends ServiceConfig {
     if (Array.isArray(config.data)) {
       const newData: Array<any> = [];
       config.data.forEach((value, index) => {
-        newData[index] = value instanceof Model
-          ? value.toObject()
-          : value;
-      })
+        newData[index] = value instanceof Model ? value.toObject() : value;
+      });
       config.data = newData;
     }
   }
@@ -293,7 +282,7 @@ export default class Service extends ServiceConfig {
    * Request Error Callback
    */
   error = (
-    reason: AxiosError<any>|AxiosResponse<any>,
+    reason: AxiosError<any> | AxiosResponse<any>,
     resolve: CallableFunction,
     reject: CallableFunction,
     callable?: CallableFunction,
@@ -306,11 +295,7 @@ export default class Service extends ServiceConfig {
   /**
    * Request Complete Callback
    */
-  complete = (
-    resolve: CallableFunction,
-    reject: CallableFunction,
-    callable?: CallableFunction,
-  ) => {
+  complete = (resolve: CallableFunction, reject: CallableFunction, callable?: CallableFunction) => {
     d.d('complete');
     callable && callable();
   };
@@ -329,9 +314,10 @@ export default class Service extends ServiceConfig {
       case true:
         return response;
     }
-    return Promise.reject(
-        // createError(response.statusText, response.config, response.status, response.request, response)
-    );
+    return Promise
+      .reject
+      // createError(response.statusText, response.config, response.status, response.request, response)
+      ();
   };
 
   /**
@@ -358,7 +344,7 @@ export default class Service extends ServiceConfig {
    * Adding X-Authorization JWT header
    * Refresh the JWT token if expired
    */
-  requestInterceptor = async (config: InternalAxiosRequestConfig ) => {
+  requestInterceptor = async (config: InternalAxiosRequestConfig) => {
     d.info('interceptor:config', config);
     if (config.headers) {
       let jwt = Identity.getIdentity()?.jwt;

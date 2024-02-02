@@ -1,2 +1,1 @@
-export default interface RestoreView {
-}
+export default interface RestoreView {}
