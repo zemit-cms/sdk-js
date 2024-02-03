@@ -1,48 +1,73 @@
 // Zemit Core
 import Rules from '@/core/rules';
 import Model from '@/core/model';
-// import Service from '@/core/service';
+import Service from '@/core/service';
 import Identity from '@/core/identity';
 import Utils from '@/core/utils';
 import Logger, { LogLevel } from '@/core/logger';
 
-// External libraries
-import store from 'store2';
-import moment from 'moment';
-// import jose from 'jose';
-import uuid from 'uuid';
+// Services
+import AuthService from '@/services/auth.service';
+import GroupService from '@/services/group.service';
+import RoleService from '@/services/role.service';
+import TypeService from '@/services/type.service';
+import UserService from '@/services/user.service';
 
-// Export Zemit
+// Models
+import GroupModel from '@/models/group.model';
+import RoleModel from '@/models/role.model';
+import TypeModel from '@/models/type.model';
+import UserModel from '@/models/user.model';
+
+// Export Zemit Core
 export {
   Rules,
   Model,
-  // Service,
+  Service,
   Identity,
   Utils,
   Logger,
   LogLevel,
 };
 
-// Export external libraries
+// Export Services
 export {
-  store,
-  // jose,
-  uuid,
-  moment,
-};
+  AuthService,
+  GroupService,
+  RoleService,
+  TypeService,
+  UserService,
+}
 
-export default class Zemit {
+// Export Models
+export {
+  GroupModel,
+  RoleModel,
+  TypeModel,
+  UserModel,
+}
+
+export class Zemit {
   // Zemit
   rules = Rules;
   model = Model;
-  // service = Service;
+  service = Service;
   identity = Identity;
   utils = Utils;
   logger = Logger;
 
-  // External
-  moment = moment;
-  store = store;
-  uuid = uuid;
-  // jose = jose;
+  services = {
+    auth: AuthService,
+    group: GroupService,
+    role: RoleService,
+    type: TypeService,
+    user: UserService,
+  }
+
+  models = {
+    group: GroupModel,
+    role: RoleModel,
+    type: TypeModel,
+    user: UserModel,
+  }
 }

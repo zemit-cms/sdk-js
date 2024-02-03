@@ -1,152 +1,122 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var moment_1 = require("moment");
-var IpAddress = require("ip-address");
-var Rules = /** @class */ (function () {
-    function Rules() {
-    }
-    Rules.empty = function (value) {
+import moment from 'moment';
+import * as IpAddress from 'ip-address';
+export default class Rules {
+    static empty(value) {
         return typeof value === 'undefined' || value === null || value === '' || value === 0 || !value;
-    };
-    Rules.required = function (value) {
-        if (value === void 0) { value = ''; }
+    }
+    static required(value = '') {
         return ((Array.isArray(value) && value.length > 0) ||
             (typeof value === 'string' && !!value) ||
-            (typeof value === 'object' && !Array.isArray(value) && value !== null) ||
-            (typeof value === 'number' && !isNaN(value)));
-    };
-    Rules.ipv4 = function (ipv4) {
+            (typeof value === 'object' && !Array.isArray(value) && value !== null) || false);
+    }
+    static ipv4(ipv4) {
         try {
             return new IpAddress.Address4(ipv4).isCorrect();
         }
         catch (e) {
             return false;
         }
-    };
-    Rules.ipv6 = function (ipv6) {
+    }
+    static ipv6(ipv6) {
         try {
             return new IpAddress.Address6(ipv6).isCorrect();
         }
         catch (e) {
             return false;
         }
-    };
-    Rules.email = function (email, options) {
-        if (options === void 0) { options = {}; }
-        var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    }
+    static email(email, options = {}) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (re.test(String(email).toLowerCase())) {
             // Validate local domain
-            var domain = email.split('@')[1];
+            const domain = email.split('@')[1];
             if (options.allowLocalDomains) {
                 return true;
             }
             else {
-                var tld = domain.split('.')[1] || '';
+                const tld = domain.split('.')[1] || '';
                 // TLDs must have at least 2 characters to be valid
                 return tld.length >= 2;
             }
         }
         return false;
-    };
-    Rules.isLength = function (value, length, allowEmpty) {
-        if (value === void 0) { value = ''; }
-        if (length === void 0) { length = 8; }
-        if (allowEmpty === void 0) { allowEmpty = false; }
+    }
+    static isLength(value = '', length = 8, allowEmpty = false) {
         return (!value && allowEmpty) || (value || '').length === length;
-    };
-    Rules.minLength = function (value, min, allowEmpty) {
-        if (value === void 0) { value = ''; }
-        if (min === void 0) { min = 8; }
-        if (allowEmpty === void 0) { allowEmpty = false; }
+    }
+    static minLength(value = '', min = 8, allowEmpty = false) {
         return (!value && allowEmpty) || (value || '').length >= min;
-    };
-    Rules.maxLength = function (value, max) {
-        if (value === void 0) { value = ''; }
-        if (max === void 0) { max = 16; }
+    }
+    static maxLength(value = '', max = 16) {
         return (value || '').length <= max;
-    };
-    Rules.betweenLength = function (value, min, max, allowEmpty) {
-        if (value === void 0) { value = ''; }
-        if (min === void 0) { min = 0; }
-        if (max === void 0) { max = 0; }
-        if (allowEmpty === void 0) { allowEmpty = false; }
+    }
+    static betweenLength(value = '', min = 0, max = 0, allowEmpty = false) {
         return this.minLength(value, min, allowEmpty) && this.maxLength(value, max);
-    };
-    Rules.isBetween = function (value, min, max) {
-        if (value === void 0) { value = 0; }
-        if (min === void 0) { min = null; }
-        if (max === void 0) { max = null; }
+    }
+    static isBetween(value = 0, min = null, max = null) {
         return !((min !== null && max !== null && (value < min || value > max)) ||
             (min !== null && value < min) ||
             (max !== null && value > max));
-    };
-    Rules.isBetweenDates = function (value, min, max) {
-        if (value === void 0) { value = new Date(); }
-        if (min === void 0) { min = null; }
-        if (max === void 0) { max = null; }
+    }
+    static isBetweenDates(value = new Date(), min = null, max = null) {
         return !((min !== null && max !== null && (value < min || value > max)) ||
             (min !== null && value < min) ||
             (max !== null && value > max));
-    };
-    Rules.identical = function (compare, value) {
-        if (compare === void 0) { compare = ''; }
-        if (value === void 0) { value = ''; }
+    }
+    static identical(compare = '', value = '') {
         return value === compare;
-    };
-    Rules.digit = function (value) {
-        if (value === void 0) { value = ''; }
+    }
+    static digit(value = '') {
         return Number.isInteger(Number(value)) && value !== null;
-    };
-    Rules.date = function (value, format) {
-        if (format === void 0) { format = 'YYYY-MM-DD'; }
-        var v = (0, moment_1.default)(value, format);
+    }
+    static date(value, format = 'YYYY-MM-DD') {
+        const v = moment(value, format);
         return v.isValid();
-    };
-    Rules.boolean = function (value) {
-        if (value === void 0) { value = ''; }
+    }
+    static boolean(value = '') {
         return typeof value === 'boolean' || value === '1' || value === '0' || value === 1 || value === 0;
-    };
-    Rules.includes = function (value, domain) {
+    }
+    static includes(value, domain) {
         return domain.includes(value);
-    };
-    Rules.excludes = function (value, domain) {
+    }
+    static excludes(value, domain) {
         return !domain.includes(value);
-    };
+    }
     // The password is at least 8 characters long (?=.{8,}).
     // The password has at least one uppercase letter (?=.*[A-Z]).
     // The password has at least one lowercase letter (?=.*[a-z]).
     // The password has at least one digit (?=.*[0-9]).
     // The password has at least one special character ([^A-Za-z0-9]).
     // Strong: The password has to meet all the requirements.
-    Rules.strongPassword = function (value) {
+    static strongPassword(value) {
         return /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/.test(value);
-    };
+    }
     // If the password is at least six characters long and meets all the other requirements, or has no digit but meets the rest of the requirements.
-    Rules.mediumPassword = function (value) {
+    static mediumPassword(value) {
         return /((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))/.test(value);
-    };
-    Rules.password = function (value) {
+    }
+    static password(value) {
         return (this.betweenLength(value, 8, 36) && this.hasLowerCase(value) && this.hasUpperCase(value) && this.hasDigit(value));
-    };
-    Rules.hasLowerCase = function (value) {
+    }
+    static hasLowerCase(value) {
         return typeof value === 'string' ? /[a-z]/.test(value) : false;
-    };
-    Rules.hasUpperCase = function (value) {
+    }
+    static hasUpperCase(value) {
         return typeof value === 'string' ? /[A-Z]/.test(value) : false;
-    };
-    Rules.hasDigit = function (value) {
+    }
+    static hasDigit(value) {
         return typeof value === 'string' ? /[0-9]/.test(value) : typeof value === 'number';
-    };
-    Rules.isPositive = function (value) {
+    }
+    static isPositive(value) {
         return value > 0;
-    };
-    Rules.isNegative = function (value) {
+    }
+    static isNegative(value) {
         return value < 0;
-    };
-    Rules.isFuture = function (value) {
-        var today = new Date();
+    }
+    static isFuture(value) {
+        const today = new Date();
         return value > today;
-    };
+    }
     /**
      * Checks whether a string contains any special characters.
      *
@@ -166,9 +136,8 @@ var Rules = /** @class */ (function () {
      * console.log(containsSpecial); // Outputs: true
      * ```
      */
-    Rules.containsSpecialChar = function (value, allowEmpty) {
-        if (allowEmpty === void 0) { allowEmpty = false; }
-        var specialCharRegex = /[!@#$%^&*()\-_=+\[\]{};:,.<>\/?\\|`]/;
+    static containsSpecialChar(value, allowEmpty = false) {
+        const specialCharRegex = /[!@#$%^&*()\-_=+\[\]{};:,.<>\/?\\|`]/;
         if (value.length === 0) {
             // If the string is empty, return the value of allowEmpty.
             return allowEmpty;
@@ -177,30 +146,29 @@ var Rules = /** @class */ (function () {
             // Otherwise, check if the string contains a special character.
             return specialCharRegex.test(value);
         }
-    };
-    Rules.alphanumeric = function (value, allowEmpty) {
-        if (allowEmpty === void 0) { allowEmpty = true; }
+    }
+    static alphanumeric(value, allowEmpty = true) {
         return /[^a-zA-Z0-9]/g.test(value) || (allowEmpty && Rules.empty(value));
-    };
-    Rules.isUrl = function (value) {
+    }
+    static isUrl(value) {
         try {
-            var url = new URL(value);
+            const url = new URL(value);
             return true;
         }
         catch (err) {
             return false;
         }
-    };
-    Rules.isHttpUrl = function (value) {
+    }
+    static isHttpUrl(value) {
         try {
-            var newUrl = new URL(value);
+            const newUrl = new URL(value);
             return newUrl.protocol === 'http:' || newUrl.protocol === 'https:';
         }
         catch (err) {
             return false;
         }
-    };
-    Rules.isRegex = function (value) {
+    }
+    static isRegex(value) {
         try {
             RegExp(value);
             return true;
@@ -208,8 +176,6 @@ var Rules = /** @class */ (function () {
         catch (e) {
             return false;
         }
-    };
-    return Rules;
-}());
-exports.default = Rules;
+    }
+}
 //# sourceMappingURL=rules.js.map

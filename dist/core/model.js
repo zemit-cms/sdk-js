@@ -1,22 +1,20 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var logger_1 = require("@/core/logger");
-var deepmerge_1 = require("deepmerge");
-var d = new logger_1.default('zemit/core/model');
-var Model = /** @class */ (function () {
-    function Model(data) {
-        if (data === void 0) { data = {}; }
-        this.autoIncrementId = 0;
-        this.position = 0;
-        this.loading = false;
-        this.data = {};
-        this.originalData = {};
-        this.originalDataJSON = null;
-        this.states = {
-            saving: false,
-            deleting: false,
-            restoring: false,
-        };
+import Logger from '@/core/logger';
+import deepmerge from 'deepmerge';
+const d = new Logger('zemit/core/model');
+export default class Model {
+    static staticAutoIncrementId = 0;
+    autoIncrementId = 0;
+    position = 0;
+    loading = false;
+    data = {};
+    originalData = {};
+    originalDataJSON = null;
+    states = {
+        saving: false,
+        deleting: false,
+        restoring: false,
+    };
+    constructor(data = {}) {
         this._autoIncrement();
         this.setDefault(this.default(), this.getData(data));
         this.map(this.columnMap());
@@ -24,93 +22,77 @@ var Model = /** @class */ (function () {
         this.castColumns(this.columnCast());
         this.mapUploads();
     }
-    Object.defineProperty(Model.prototype, "Loading", {
-        get: function () {
-            return this.loading;
-        },
-        set: function (loading) {
-            this.loading = loading;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Model.prototype, "Position", {
-        get: function () {
-            return this.position;
-        },
-        set: function (position) {
-            this.position = position;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Model.prototype, "AutoIncrementId", {
-        get: function () {
-            return this.autoIncrementId;
-        },
-        set: function (autoIncrementId) {
-            this.autoIncrementId = autoIncrementId;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Model.prototype._autoIncrement = function () {
+    get Loading() {
+        return this.loading;
+    }
+    set Loading(loading) {
+        this.loading = loading;
+    }
+    get Position() {
+        return this.position;
+    }
+    set Position(position) {
+        this.position = position;
+    }
+    get AutoIncrementId() {
+        return this.autoIncrementId;
+    }
+    set AutoIncrementId(autoIncrementId) {
+        this.autoIncrementId = autoIncrementId;
+    }
+    _autoIncrement() {
         return (this.autoIncrementId = Model.staticAutoIncrementId++);
-    };
-    Model.prototype.getData = function (data) {
-        if (data === void 0) { data = this.data; }
+    }
+    getData(data = this.data) {
         if (data instanceof Model) {
             return data.data;
         }
         return data;
-    };
-    Model.prototype.default = function () {
+    }
+    default() {
         return {
         // modellist: [],
         };
-    };
-    Model.prototype.relatedMap = function () {
+    }
+    relatedMap() {
         return {
         // model: Model,
         // modelentity: Model,
         // modellist: Model,
         };
-    };
-    Model.prototype.uploadMap = function () {
+    }
+    uploadMap() {
         return {};
-    };
-    Model.prototype.columnMap = function () {
+    }
+    columnMap() {
         return {
         // id: 'index',
         // index: 'id',
         };
-    };
-    Model.prototype.columnCast = function () {
+    }
+    columnCast() {
         return {
         // id: 'number',
         // deleted: 'bool',
         // label: 'string',
         };
-    };
+    }
     /**
      * Set Default Data
      */
-    Model.prototype.setDefault = function (defaultData, data) {
-        if (defaultData === void 0) { defaultData = this.default(); }
-        if (data === void 0) { data = this.data; }
+    setDefault(defaultData = this.default(), data = this.data) {
         Object.assign(this.data, structuredClone(defaultData), this.getData(data));
-    };
+    }
     /**
      * Map Columns
      */
-    Model.prototype.map = function (map, data) {
-        if (data === void 0) { data = this; }
+    map(map, data = this) {
         // No mapping to process
         if (!map) {
             return;
         }
         // No mapping to process
-        var length = Object.keys(map).length;
+        let length = Object.keys(map).length;
         if (!length) {
             return;
         }
@@ -125,7 +107,7 @@ var Model = /** @class */ (function () {
         // Map data object keys
         do {
             length = Object.keys(map).length;
-            for (var key in map) {
+            for (const key in map) {
                 if (Object.prototype.hasOwnProperty.call(map, key) && data[map[key]] !== 'undefined') {
                     // do not overwrite existing property
                     if (Object.prototype.hasOwnProperty.call(data, map[key])) {
@@ -148,12 +130,11 @@ var Model = /** @class */ (function () {
                 }
             }
         } while (Object.keys(map).length && Object.keys(map).length !== length);
-    };
+    }
     /**
      * Map Related Records
      */
-    Model.prototype.mapRelated = function (map, data) {
-        if (data === void 0) { data = this; }
+    mapRelated(map, data = this) {
         // No mapping to process
         if (!map || !Object.keys(map).length) {
             return;
@@ -166,43 +147,38 @@ var Model = /** @class */ (function () {
         if (typeof data !== 'object') {
             return;
         }
-        var _loop_1 = function (key) {
-            if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== 'undefined') {
-                var RelatedModel_1 = map[key];
-                data[key] = Array.isArray(data[key])
-                    ? data[key].map(function (related) { return (related instanceof RelatedModel_1 ? related : new RelatedModel_1(related)); }) // map list
-                    : data[key] instanceof RelatedModel_1
-                        ? data[key]
-                        : new RelatedModel_1(data[key]); // map single
-            }
-        };
         // Map related records
-        for (var key in map) {
-            _loop_1(key);
+        for (const key in map) {
+            if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== 'undefined') {
+                const RelatedModel = map[key];
+                data[key] = Array.isArray(data[key])
+                    ? data[key].map((related) => (related instanceof RelatedModel ? related : new RelatedModel(related))) // map list
+                    : data[key] instanceof RelatedModel
+                        ? data[key]
+                        : new RelatedModel(data[key]); // map single
+            }
         }
-    };
-    Model.prototype.mapUploads = function () {
-        var _this = this;
-        var uploadMap = this.uploadMap();
-        Object.keys(uploadMap).forEach(function (key) {
-            if (_this.data[key]) {
-                _this.data[uploadMap[key].key] = _this.data[key].id;
+    }
+    mapUploads() {
+        const uploadMap = this.uploadMap();
+        Object.keys(uploadMap).forEach((key) => {
+            if (this.data[key]) {
+                this.data[uploadMap[key].key] = this.data[key].id;
             }
         });
-    };
+    }
     /**
      * Cast columns
      */
-    Model.prototype.castColumns = function (cast) {
-        if (cast === void 0) { cast = this.columnCast(); }
-        var casted = {};
-        for (var key in cast) {
+    castColumns(cast = this.columnCast()) {
+        const casted = {};
+        for (const key in cast) {
             if (Object.prototype.hasOwnProperty.call(this.data, key)) {
                 switch (cast[key]) {
                     case 'bool':
                     case 'boolean':
                         // eslint-disable-next-line no-case-declarations
-                        var s = this.data[key] && this.data[key].toString().toLowerCase().trim();
+                        const s = this.data[key] && this.data[key].toString().toLowerCase().trim();
                         casted[key] = s === 'true' || s === '1';
                         break;
                     case 'string':
@@ -223,18 +199,16 @@ var Model = /** @class */ (function () {
             }
         }
         this.assign(casted);
-    };
+    }
     /**
      * Assign or append this model to target based on properties
      */
-    Model.prototype.assignToArrayByProperty = function (target, props, toLowerCase) {
-        if (toLowerCase === void 0) { toLowerCase = false; }
+    assignToArrayByProperty(target, props, toLowerCase = false) {
         d.d('assignToArrayByProperty', target, this, props);
-        var append = true;
-        for (var _i = 0, target_1 = target; _i < target_1.length; _i++) {
-            var object = target_1[_i];
-            var assign = true;
-            for (var prop in props) {
+        let append = true;
+        for (const object of target) {
+            let assign = true;
+            for (const prop in props) {
                 if ((!toLowerCase && object.data[prop] !== props[prop]) ||
                     (toLowerCase && object.data[prop].toLowerCase() !== props[prop].toLowerCase())) {
                     assign = false;
@@ -251,29 +225,23 @@ var Model = /** @class */ (function () {
             d.d('assignToArrayByProperty:append', target, this);
             target.push(this);
         }
-    };
+    }
     /**
      * Sort property by key
      */
-    Model.prototype.sortByProperty = function (property, key, id) {
-        if (property === void 0) { property = 'position'; }
-        if (id === void 0) { id = 'id'; }
-        return this.data[property].sort(function (a, b) {
-            return a.data[key] > b.data[key] ? 1 : a.data[key] === b.data[key] ? (a.data[id] > b.data[id] ? 1 : -1) : -1;
-        });
-    };
+    sortByProperty(property = 'position', key, id = 'id') {
+        return this.data[property].sort((a, b) => a.data[key] > b.data[key] ? 1 : a.data[key] === b.data[key] ? (a.data[id] > b.data[id] ? 1 : -1) : -1);
+    }
     /**
      * Convert data Models into nested Objects
      */
-    Model.prototype.toObject = function (data, keepRelationship) {
-        if (data === void 0) { data = this.data; }
-        if (keepRelationship === void 0) { keepRelationship = false; }
+    toObject(data = this.data, keepRelationship = false) {
         data = this.getData(data);
-        var ret = {};
-        for (var key in data) {
+        const ret = {};
+        for (const key in data) {
             if (Array.isArray(data[key])) {
                 ret[key] = [];
-                for (var listKey in data[key]) {
+                for (const listKey in data[key]) {
                     if (data[key][listKey] instanceof Model) {
                         ret[key][listKey] = data[key][listKey].toObject();
                     }
@@ -298,85 +266,77 @@ var Model = /** @class */ (function () {
             }
         }
         return structuredClone(ret);
-    };
+    }
     /**
      * JSON of data
      */
-    Model.prototype.toJson = function (data) {
-        if (data === void 0) { data = this.data; }
+    toJson(data = this.data) {
         return JSON.stringify(this.toObject(data));
-    };
+    }
     /**
      * Sync to data
      */
-    Model.prototype.sync = function (data) {
-        if (data === void 0) { data = {}; }
+    sync(data = {}) {
         data = this.getData(data);
-        for (var key in data) {
+        for (const key in data) {
             if (Object.prototype.hasOwnProperty.call(data, key)) {
                 this.data[key] = data[key];
             }
         }
-    };
+    }
     /**
      * Assign to data
      */
-    Model.prototype.assign = function (data, specificKeys) {
-        if (data === void 0) { data = {}; }
-        if (specificKeys === void 0) { specificKeys = []; }
-        var newData = this.getData(data);
+    assign(data = {}, specificKeys = []) {
+        const newData = this.getData(data);
         if (specificKeys.length > 0) {
-            Object.keys(newData).forEach(function (key) {
+            Object.keys(newData).forEach((key) => {
                 if (!specificKeys.includes(key)) {
                     delete newData[key];
                 }
             });
         }
-        var result = Object.assign(this.data, newData);
+        const result = Object.assign(this.data, newData);
         this.setOriginalData();
         return result;
-    };
+    }
     /**
      * Deep Merge to data
      */
-    Model.prototype.deepmerge = function (data, options) {
-        if (data === void 0) { data = {}; }
-        deepmerge_1.default.all([this.data, this.getData(data)], options);
-    };
+    deepmerge(data = {}, options) {
+        deepmerge.all([this.data, this.getData(data)], options);
+    }
     /**
      * Clone Entire Model
      */
-    Model.prototype.clone = function () {
+    clone() {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        var clone = new this.constructor(structuredClone(this.toObject(this.data, true)));
+        const clone = new this.constructor(structuredClone(this.toObject(this.data, true)));
         clone.setOriginalData();
         return clone;
-    };
-    Model.prototype.setOriginalData = function (data) {
-        var newData = this.toObject(data, true);
+    }
+    setOriginalData(data) {
+        const newData = this.toObject(data, true);
         this.originalData = structuredClone(newData);
         this.originalDataJSON = JSON.stringify(newData);
         return newData;
-    };
-    Model.prototype.isDifferentFromOriginal = function (data) {
-        var originalDataJson = this.originalDataJSON === null ? this.setOriginalData() : this.originalDataJSON;
+    }
+    isDifferentFromOriginal(data) {
+        const originalDataJson = this.originalDataJSON === null ? this.setOriginalData() : this.originalDataJSON;
         if (data) {
             return JSON.stringify(data) !== originalDataJson;
         }
         else {
-            var saveData = this.toObject(this.data, true);
+            const saveData = this.toObject(this.data, true);
             return JSON.stringify(saveData) !== originalDataJson;
         }
-    };
-    Model.prototype.revertData = function () {
+    }
+    revertData() {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         this.data = new this.constructor(structuredClone(this.originalData)).data;
         this.setOriginalData();
-    };
-    Model.staticAutoIncrementId = 0;
-    return Model;
-}());
-exports.default = Model;
+    }
+}
 //# sourceMappingURL=model.js.map

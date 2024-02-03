@@ -1,4 +1,4 @@
-import Zemit from '../index';
+import {Zemit} from '../index';
 
 describe('Zemit', () => {
   let zemit: Zemit;

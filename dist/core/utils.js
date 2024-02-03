@@ -1,10 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var camel_case_1 = require("camel-case");
-var uuid_1 = require("uuid");
-var Utils = /** @class */ (function () {
-    function Utils() {
-    }
+import { camelCase, camelCaseTransformMerge } from 'camel-case';
+import { v4 as uuidv4 } from 'uuid';
+export default class Utils {
     /**
      * Generates a universally unique identifier (UUID) using the v4 UUID standard.
      *
@@ -26,10 +22,9 @@ var Utils = /** @class */ (function () {
      *
      * @see {@link https://github.com/uuidjs/uuid#version-4-random}
      */
-    Utils.uuid = function (options) {
-        if (options === void 0) { options = {}; }
-        return (0, uuid_1.v4)(options);
-    };
+    static uuid(options = {}) {
+        return uuidv4(options);
+    }
     /**
      * Removes all types of line breaks from a string.
      *
@@ -47,9 +42,9 @@ var Utils = /** @class */ (function () {
      * console.log(result); // Outputs: "HelloWorldHowAre You"
      * ```
      */
-    Utils.removeLineBreaks = function (str) {
+    static removeLineBreaks(str) {
         return str.replace(/(\r\n|\n|\r)/gm, '');
-    };
+    }
     /**
      * Converts a string to camelCase. The function works by replacing all words or standalone
      * characters with the first letter of each word capitalized except for the very first character
@@ -58,18 +53,18 @@ var Utils = /** @class */ (function () {
      * @param str - The string to convert to camelCase.
      * @returns The camelCased string.
      */
-    Utils.camelize = function (str) {
-        return (0, camel_case_1.camelCase)(str, { transform: camel_case_1.camelCaseTransformMerge });
-    };
+    static camelize(str) {
+        return camelCase(str, { transform: camelCaseTransformMerge });
+    }
     /**
      * Capitalizes the first letter of a string.
      *
      * @param str - The string to capitalize.
      * @returns The capitalized string.
      */
-    Utils.capitalize = function (str) {
+    static capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
-    };
+    }
     /**
      * Function to remove all HTML tags from a string and optionally truncate it to a specified length.
      *
@@ -84,18 +79,15 @@ var Utils = /** @class */ (function () {
      *
      * @returns A string without HTML tags and truncated to the specified limit (if any).
      */
-    Utils.stripHtml = function (html, limit) {
-        if (limit === void 0) { limit = null; }
+    static stripHtml(html, limit = null) {
         // Parse the HTML string into a DOM Document.
-        var doc = new DOMParser().parseFromString(html, 'text/html');
+        const doc = new DOMParser().parseFromString(html, 'text/html');
         // Get the text content of the body element of the Document, or an empty string if there's no
         // text content.
-        var text = doc.body.textContent || '';
+        const text = doc.body.textContent || '';
         // If limit is null, return the entire text. If limit is a number, return up to limit characters
         // of the text.
         return limit === null ? text : text.length > limit ? text.substring(0, limit) : text;
-    };
-    return Utils;
-}());
-exports.default = Utils;
+    }
+}
 //# sourceMappingURL=utils.js.map

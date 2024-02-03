@@ -9,7 +9,6 @@ import axios, {
   AxiosResponse,
 } from 'axios';
 import Logger from '@/core/logger';
-import Identity from '@/core/identity';
 import moment from 'moment/moment';
 import GetView from '@/types/get-view.type';
 import ZemitData from '@/types/zemit-data.type';
@@ -329,12 +328,12 @@ export default class Service extends ServiceConfig {
     if (this.refreshOnUnauthorized && reject.response) {
       if (reject.response.status === 401 && !this.retry) {
         this.retry = true;
-        await Identity.refreshPromise();
-        if (Identity.isLoggedIn()) {
+        // await Identity.refreshPromise();
+        // if (Identity.isLoggedIn()) {
           if (reject.config) {
             return this.http(reject.config);
           }
-        }
+        // }
       }
     }
     return Promise.reject(reject);
@@ -347,19 +346,19 @@ export default class Service extends ServiceConfig {
   requestInterceptor = async (config: InternalAxiosRequestConfig) => {
     d.info('interceptor:config', config);
     if (config.headers) {
-      let jwt = Identity.getIdentity()?.jwt;
-      if (jwt) {
-        if (this.refreshOnUnauthorized) {
-          // const token = jose.decodeJwt(jwt);
-          // const exp = token.exp || false;
-          // if (token && exp && exp <= moment().unix()) {
-          //   d.d('jwt:expired', jwt);
-          //   await Identity.refreshPromise();
-          //   jwt = Identity.getIdentity()?.jwt;
-          // }
-        }
-        config.headers['X-Authorization'] = `Bearer ${jwt}`;
-      }
+      // let jwt = Identity.getIdentity()?.jwt;
+      // if (jwt) {
+      //   if (this.refreshOnUnauthorized) {
+      //     // const token = jose.decodeJwt(jwt);
+      //     // const exp = token.exp || false;
+      //     // if (token && exp && exp <= moment().unix()) {
+      //     //   d.d('jwt:expired', jwt);
+      //     //   await Identity.refreshPromise();
+      //     //   jwt = Identity.getIdentity()?.jwt;
+      //     // }
+      //   }
+      //   config.headers['X-Authorization'] = `Bearer ${jwt}`;
+      // }
     }
     return config;
   };

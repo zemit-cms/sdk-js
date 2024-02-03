@@ -32,6 +32,5 @@ export default class Identity {
      */
     static has(needles?: NestedArrayOr<string>, haystack?: Array<string>, or?: boolean): boolean;
     static hasPermission(): void;
-    static refreshPromise: () => Promise<AxiosResponse<ZemitData<RefreshView>, any>>;
 }
 //# sourceMappingURL=identity.d.ts.map

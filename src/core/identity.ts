@@ -108,17 +108,5 @@ export default class Identity {
 
   static hasPermission() {}
 
-  static refreshPromise = () => {
-    if (!Identity.refreshResponse) {
-      const refreshToken = Identity.getIdentity()?.refreshToken;
-      Identity.refreshResponse = new Promise((resolve, reject) =>
-        AuthService.getInstance()
-          .refresh({ refreshToken })
-          .then((response) => Identity.setIdentity(response.data.view) && resolve(response))
-          .catch((reason) => reject(reason))
-          .finally(() => (Identity.refreshResponse = null)),
-      );
-    }
-    return Identity.refreshResponse;
-  };
+
 }

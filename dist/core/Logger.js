@@ -1,4 +1,3 @@
-"use strict";
 /**
  * Simple logger system with the possibility of registering custom outputs.
  *
@@ -30,103 +29,74 @@
  *
  * If you want to process logs through other outputs than console, you can add LogOutput functions to Logger.outputs.
  */
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LogLevel = void 0;
 /**
  * The possible log levels.
  * LogLevel.Off is never emitted and only used with Logger.level property to disable logs.
  */
-var LogLevel;
+export var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["Off"] = 0] = "Off";
     LogLevel[LogLevel["Error"] = 1] = "Error";
     LogLevel[LogLevel["Warning"] = 2] = "Warning";
     LogLevel[LogLevel["Info"] = 3] = "Info";
     LogLevel[LogLevel["Debug"] = 4] = "Debug";
-})(LogLevel || (exports.LogLevel = LogLevel = {}));
-var Logger = /** @class */ (function () {
-    function Logger(source) {
-        this.source = source;
-        /**
-         * Logs messages or objects  with the debug level.
-         * Works the same as console.log().
-         */
-        this.d = this.debug;
-    }
-    /**
-     * Enables production mode.
-     * Sets logging level to LogLevel.Warning.
-     */
-    Logger.enableProductionMode = function () {
-        Logger.level = LogLevel.Warning;
-    };
-    Logger.prototype.debug = function () {
-        var objects = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            objects[_i] = arguments[_i];
-        }
-        this.log(console.log, LogLevel.Debug, objects);
-    };
-    /**
-     * Logs messages or objects  with the info level.
-     * Works the same as console.log().
-     */
-    Logger.prototype.info = function () {
-        var objects = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            objects[_i] = arguments[_i];
-        }
-        this.log(console.info, LogLevel.Info, objects);
-    };
-    /**
-     * Logs messages or objects  with the warning level.
-     * Works the same as console.log().
-     */
-    Logger.prototype.warn = function () {
-        var objects = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            objects[_i] = arguments[_i];
-        }
-        this.log(console.warn, LogLevel.Warning, objects);
-    };
-    /**
-     * Logs messages or objects  with the error level.
-     * Works the same as console.log().
-     */
-    Logger.prototype.error = function () {
-        var objects = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            objects[_i] = arguments[_i];
-        }
-        this.log(console.error, LogLevel.Error, objects);
-    };
-    Logger.prototype.log = function (func, level, objects) {
-        var _this = this;
-        if (level <= Logger.level) {
-            var log = this.source ? ['[' + this.source + ']'].concat(objects) : objects;
-            func.apply(func, log);
-            Logger.outputs.forEach(function (output) { return output.apply(output, __spreadArray([_this.source, level], objects, true)); });
-        }
-    };
+})(LogLevel || (LogLevel = {}));
+export default class Logger {
+    source;
     /**
      * Current logging level.
      * Set it to LogLevel.Off to disable logs completely.
      */
-    Logger.level = LogLevel.Debug;
+    static level = LogLevel.Debug;
     /**
      * Additional log outputs.
      */
-    Logger.outputs = [];
-    return Logger;
-}());
-exports.default = Logger;
+    static outputs = [];
+    /**
+     * Enables production mode.
+     * Sets logging level to LogLevel.Warning.
+     */
+    static enableProductionMode() {
+        Logger.level = LogLevel.Warning;
+    }
+    constructor(source) {
+        this.source = source;
+    }
+    /**
+     * Logs messages or objects  with the debug level.
+     * Works the same as console.log().
+     */
+    d = this.debug;
+    debug(...objects) {
+        this.log(console.log, LogLevel.Debug, objects);
+    }
+    /**
+     * Logs messages or objects  with the info level.
+     * Works the same as console.log().
+     */
+    info(...objects) {
+        this.log(console.info, LogLevel.Info, objects);
+    }
+    /**
+     * Logs messages or objects  with the warning level.
+     * Works the same as console.log().
+     */
+    warn(...objects) {
+        this.log(console.warn, LogLevel.Warning, objects);
+    }
+    /**
+     * Logs messages or objects  with the error level.
+     * Works the same as console.log().
+     */
+    error(...objects) {
+        this.log(console.error, LogLevel.Error, objects);
+    }
+    log(func, level, objects) {
+        if (level <= Logger.level) {
+            const log = this.source ? ['[' + this.source + ']'].concat(objects) : objects;
+            func.apply(func, log);
+            Logger.outputs.forEach((output) => output.apply(output, [this.source, level, ...objects]));
+        }
+    }
+}
 //# sourceMappingURL=logger.js.map

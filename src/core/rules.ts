@@ -29,12 +29,9 @@ export default class Rules {
   }
 
   static required(value: Array<any> | string | null = ''): boolean {
-    return (
-      (Array.isArray(value) && value.length > 0) ||
-      (typeof value === 'string' && !!value) ||
-      (typeof value === 'object' && !Array.isArray(value) && value !== null) ||
-      (typeof value === 'number' && !isNaN(value))
-    );
+    return ((Array.isArray(value) && value.length > 0) ||
+        (typeof value === 'string' && !!value) ||
+        (typeof value === 'object' && !Array.isArray(value) && value !== null) || false);
   }
 
   static ipv4(ipv4: string) {
